@@ -1,4 +1,4 @@
-fetch('http://localhost:2006/productos')
+fetch('https://ecommerce-6lbf.onrender.com/productos')
 .then(respuesta => respuesta.json())
 .then(datos => mostrarProductos(datos))
 const mostrarProductos = (datos) => {
