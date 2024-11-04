@@ -16,7 +16,7 @@ app.use(cors())
 
 const leerDatos = () => {
     try {   //intenta convertir cadena, si no funciona nos muestra por consol el error (catch)
-        const datos = fs.readFileSync('./data/datos.json')
+        const datos = fs.readFileSync('./public/data/datos.json')
 
         return JSON.parse(datos); // Convierte una cadena JSON en un objeto JavaScript
         // console.log(JSON.parse(datos)) probar si funciona y despues llamar funcion
@@ -27,7 +27,7 @@ const leerDatos = () => {
 //leerDatos()
 const escribirDatos = (datos) => {
     try {
-        fs.writeFileSync('./data/datos.json', JSON.stringify(datos)) //writeFile permite escribir datos || JSON.stringify convierte un objeto JS en JSON
+        fs.writeFileSync('./public/data/datos.json', JSON.stringify(datos)) //writeFile permite escribir datos || JSON.stringify convierte un objeto JS en JSON
 
     } catch (error) {
         console.log(error)
@@ -68,17 +68,21 @@ app.post('/productos', (req, res) => {
 
 app.put('/productos/:id', (req, res) => {
     // res.send('Actualizar producto por id')
-    const id= req.params.id;
+     console.log(req.body)
+     console.log(req.params.id)
+     const id= req.params.id;
     const nuevosDatos= req.body;
+   
+
     const datos = leerDatos()
     const prodEncontrado=datos.productos.find((p)=>p.id ==req.params.id)
-    console.log(prodEncontrado)
+    //console.log(prodEncontrado)
     if (!prodEncontrado) {
-        return res.status(404).json({"Mensaje":"No se encontró el producto"})
+        return res.status(404).json('No se encontró el producto')
     }
     datos.productos = datos.productos.map(p => p.id == req.params.id ? { ...p, ...nuevosDatos } : p)
     escribirDatos(datos)
-    res.json({"Mensaje":"Producto Actualizado"})
+    res.json({mensaje:'Producto actualizado correctamente'})
 })
 
 app.delete('/productos/:id', (req, res) => {

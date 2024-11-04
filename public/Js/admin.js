@@ -58,7 +58,7 @@ fetch(endpoint)
                 <strong>$${prod.precio}</strong>
               </p>
             <div class="d-flex ms-auto">
-              <a href="#prodEditar" class="btn btn-outline-primary me-2 edit" onClick="editar(${prod.id})">
+              <a class="btn btn-outline-primary me-2 " onClick="editar(${prod.id})">
                 <i class="bi bi-pencil"></i>
               </a>
               <a class="btn btn-outline-danger" type="submit" onClick="eliminar(${prod.id})">
@@ -76,15 +76,16 @@ fetch(endpoint)
   }
   
 
-  // Añadir event listeners a los botones "Editar"
-  const editButtons = document.querySelectorAll('.edit');
-  editButtons.forEach(button => {
-    button.addEventListener('click', function () {
-      const formulario = document.getElementById('editar');
-      formulario.classList.toggle('newE');
-    });
-  });
-
+  // // Añadir event listeners a los botones "Editar"
+  // const editButtons = document.querySelectorAll('.edit');
+  // editButtons.forEach(button => {
+  //   button.addEventListener('click', function () {
+  //     const formulario = document.getElementById('editar');
+  //     formulario.classList.toggle('newE');
+  //   });
+  // });
+const añadir = () => {
+document.querySelector("#nuevoProd").style.display='block'
 const formulario = document.forms['formCrear']
 console.log(formulario)
 formulario.addEventListener('submit', (event) => {
@@ -131,10 +132,11 @@ formulario.addEventListener('submit', (event) => {
   }
   enviarNewProducto()
 })
-
+}
 mostrarMensaje = (mensaje) => {
   document.querySelector('#mensajeBack').innerHTML = mensaje
 }
+
 
 //Eliminar Producto
 const eliminar = (id) => {
@@ -159,13 +161,60 @@ const eliminar = (id) => {
 }
 }
 // Editar Producto
+const formEditar = document.forms['form-editar']
 const editar = (id) => {
-  console.log(id)
+  // console.log(id)
+  document.querySelector("#editar").style.display='block'
   let prodEditar = {}
   prodRecibidos.filter(prod => {
     if(prod.id == id){
       prodEditar = prod
     }
   })
-  console.log(prodEditar)
-}
+  // console.log(prodEditar)
+
+  //asignar valores obtenidos al formulario
+  formEditar.idEditar.value = prodEditar.id
+  formEditar.titulo.value = prodEditar.titulo
+  formEditar.desc.value = prodEditar.descripcion
+  formEditar.precio.value = prodEditar.precio
+}  //Enviar datos al back
+  formEditar.addEventListener('submit', (event) => {
+    event.preventDefault();
+    //creo objeto con datos nuevos
+    const nuevosDatos = {
+      id: formEditar.idEditar.value,
+      titulo: formEditar.titulo.value,
+      descripcion: formEditar.desc.value,
+      precio: formEditar.precio.value
+    }
+    //validacion de campos vacios
+    if (!nuevosDatos.titulo || !nuevosDatos.descripcion|| !nuevosDatos.precio) {
+    document.querySelector('#mensajeEditar').innerHTML = 'Complete todos los campos';
+    return
+    }
+    document.querySelector('#mensajeEditar').innerHTML = ''
+    // return
+
+    let nuevosDatosJson = JSON.stringify(nuevosDatos)
+    console.log(nuevosDatosJson)
+
+    const enviarNuevosDatos = async() => {
+      try{
+        const enviarDatos = await fetch(endpoint + '/' + nuevosDatos.id, {
+          method: 'put',
+          headers: {
+            'content-type': 'application/json'
+          },
+          body: nuevosDatosJson
+        })
+        const respuesta = await enviarDatos.json()
+        mostrarMensaje(respuesta.mensaje)
+      }
+      catch(error){
+        mostrarMensaje('Error al modificar datos')
+      }
+      setTimeout(() => {location.reload();}, 1000)
+    }
+    enviarNuevosDatos()
+  })
